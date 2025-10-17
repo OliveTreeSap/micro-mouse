@@ -1,5 +1,7 @@
 # Micromouse
 
+This repository contains the code and wiring diagram for the micromouse project
+
 ### Parts used
 - Microcontroller: WeAct ESP32-S3-A N16R8 (x1)
 - Sensors: HC-SR04 (x3)
