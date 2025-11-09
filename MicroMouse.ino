@@ -42,7 +42,7 @@ Robot Specs:
 // ======================== CONTROL PARAMETERS ========================
 // PID Gains
 const float KP_WALL = 0.5;              // Proportional gain
-const float KI_WALL = 0.03;              // Integral gain  
+const float KI_WALL = 0.01;              // Integral gain  
 const float KD_WALL = 0.5;             // Derivative gain
 
 // Target distances
@@ -50,11 +50,11 @@ const float TARGET_WALL_DIST = 6.0;      // Target distance from right wall (cm)
 
 // Wall Detection Thresholds
 const float WALL_THRESHOLD = 9.0;       // Max distance to consider wall present (cm)
-const float MIN_WALL_DIST = 2.5;         // Minimum safe distance (cm)
-const float FRONT_THRESHOLD = 6.5;        // Distance to trigger front wall turn (cm)
+const float MIN_WALL_DIST = 3;         // Minimum safe distance (cm)
+const float FRONT_THRESHOLD = 7;        // Distance to trigger front wall turn (cm)
 
 // Motor Control
-const int BASE_SPEED = 80;             // Base speed (PWM 20-255)
+const int BASE_SPEED = 100;             // Base speed (PWM 20-255)
 
 // Turn Parameters
 const int TURN_SPEED = 60;
@@ -87,9 +87,10 @@ float wallLastError = 0;
 float wallIntegral = 0;
 
 // Wall detection flags
-boolean frontwall = false;
-boolean leftwall = false;
-boolean rightwall = false;
+bool frontwall = false;
+bool leftwall = false;
+bool rightwall = false;
+bool turnedRight = false;
 
 // ======================== SETUP ========================
 void setup() {
@@ -109,7 +110,7 @@ void setup() {
   Serial.println("    Micromouse RIGHT Wall Follower");
   Serial.println("========================================");
   Serial.println();
-  delay(3000);
+  delay(1000);
 }
 
 // ======================== MAIN LOOP ========================
@@ -122,18 +123,29 @@ void loop() {
   
   // PRIORITY 1: Check for front wall
   if (frontwall == true) {
+    turnedRight = false;
     motorL.brake();
     motorR.brake();
     delay(300);
     if (rightwall == false) {
       // Turn right if there is no right wall
-      if (leftSensor > 37) {
-        turnLeft90();
-      }
-      else {
-        turnRight90(); // Hardcoded turn, maze specific :( ts so ah ngl
-      }
+      // if (leftSensor > 40) {
+      //   turnLeft90(); // Hardcoded turn, maze specific :( ts so buns ngl
 
+      //   //Clear PID errors after turn
+      //   wallError = 0;
+      //   wallLastError = 0;
+      //   wallIntegral = 0;
+
+      //   delay(200);
+      //   return; // Exit loop and restart
+      // }
+      // else {
+      
+      // Tab this in for the hardcoded run
+      turnRight90();
+      turnedRight = true;
+      
       //Clear PID errors after turn
       wallError = 0;
       wallLastError = 0;
@@ -141,6 +153,8 @@ void loop() {
 
       delay(200);
       return; // Exit loop and restart
+
+      // }
     }
     // Turn left if there is a wall on the right
     turnLeft90();
@@ -153,13 +167,14 @@ void loop() {
     delay(200);
     return; // Exit loop and restart
   }
-  if (rightwall == false){ // if there is no right wall (even there is no front wall) turn right
+  if ((turnedRight == false) && (rightwall == false)){ // if there is no right wall (even there is no front wall) turn right
     delay(200); // adjust for the robot to stop in the right place, ideally in the middle of the square
     motorL.brake();
     motorR.brake();
     delay(300);
 
     turnRight90();
+    turnedRight = true;
 
     //Clear PID errors after turn
     wallError = 0;
