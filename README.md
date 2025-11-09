@@ -11,5 +11,9 @@ This repository contains the code and wiring diagram for the micromouse project
 - 2x18650 battery box with built-in on/off switch (x1)
 - Mini breadboard (x2)
 
+## Libraries requirement
+- NewPing
+- SparkFun TB6612
+
 ### Wiring diagram
 TBD
